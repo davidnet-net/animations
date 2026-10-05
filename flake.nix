@@ -25,11 +25,49 @@
           buildInputs = with pkgs; [
             bun
             nodejs_22
-            lsof # for easy port killing eg sudo lsof -t -i:3000 -i:3020 | xargs -r sudo kill -9
+            lsof
             ffmpeg
+            # Native canvas dependencies + build tools
+            pkg-config
+            cairo
+            pango
+            harfbuzz
+            freetype
+            fontconfig
+            pixman
+            glib
+            libuuid
           ];
 
           shellHook = ''
+            # Point pkg-config to Nix store libraries so node-gyp compiles correctly
+            export PKG_CONFIG_PATH="${
+              pkgs.lib.makeSearchPath "lib/pkgconfig" [
+                pkgs.cairo
+                pkgs.pango
+                pkgs.harfbuzz
+                pkgs.freetype
+                pkgs.fontconfig
+                pkgs.pixman
+                pkgs.glib
+                pkgs.libuuid
+              ]
+            }:$PKG_CONFIG_PATH"
+
+            # Ensure runtime libraries are found by dynamic linker
+            export LD_LIBRARY_PATH="${
+              pkgs.lib.makeLibraryPath [
+                pkgs.cairo
+                pkgs.pango
+                pkgs.harfbuzz
+                pkgs.freetype
+                pkgs.fontconfig
+                pkgs.pixman
+                pkgs.glib
+                pkgs.libuuid
+              ]
+            }:$LD_LIBRARY_PATH"
+
             bun install
             echo "Bun versie: $(bun --version)"
             echo "Node versie: $(node --version)"

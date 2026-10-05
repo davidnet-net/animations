@@ -1,0 +1,13 @@
+{
+  "name": "animations",
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "private": true,
+  "dependencies": {
+    "canvas": "^3.2.3"
+  }
+}
